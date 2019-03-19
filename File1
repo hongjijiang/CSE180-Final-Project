@@ -1,1 +1,44 @@
-#Sat Mar 2
+#Add all .txt files in same folder as this code, then run
+#creates a 3d a matrix [Genome0][Genome1][Matrix of genes]
+#Genome # is order in which they appear in folder. Genome 0 = first file. Order is printed
+#Matrix[i][j][k] only populated where j>i (always compared with later genome in file)
+
+
+def compareGenome(file1, file2):
+    f = open(file1, 'r')
+    geneSeq = "" #build gene sequence here
+    geneArray = [] #output, array filled with shared genes
+    for line in f:
+        if line[0] == ">":
+            if geneSeq is "": #skip first line or empty gene
+                continue
+            elif open(file2, 'r').read().find(geneSeq)!=-1: #search for gene
+                geneArray.append(geneSeq) #if similar, add to matrix
+                geneSeq=""
+            else:
+                geneName = line #if not there, clear and go to next gene
+                geneSeq=""
+        else:
+            geneSeq += line #keep building geneSeq
+    if not geneArray:
+        geneArray.append(0)
+    return geneArray #return final matrix
+
+import os #os module imported here
+location = os.getcwd() # get present working directory location here
+counter = 0 #keep a count of all files found
+genomefiles = [] #list to store all .txt files found at location
+for file in os.listdir(location):
+    try:
+        if file.endswith(".txt"): #find all txt files
+            print counter, ":", file
+            genomefiles.append(str(file))
+            counter = counter+1
+    except Exception as e:
+        raise e
+        print "No files found here!"
+geneSeqOutput = [[0 for x in range(counter)] for y in range(counter)] #generate 2d matrix of size counter x counter
+print "Num genomes:", counter
+for i in range(counter):
+    for k in range(i+1, counter):
+        geneSeqOutput[i][k] = compareGenome(genomefiles[i], genomefiles[k]) #compare 2 genomes, k>i
